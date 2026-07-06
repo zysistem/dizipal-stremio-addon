@@ -8,31 +8,46 @@ const { setupCache } = require("axios-cache-interceptor");
 
 const instance = Axios.create();
 const axios = setupCache(instance);
+const DEFAULT_PROXY_URL = "https://dizipal1221.com";
 
+function getProxyUrl() {
+    return process.env.PROXY_URL || DEFAULT_PROXY_URL;
+}
+
+function resolveUrl(pathOrUrl) {
+    if (/^https?:\/\//i.test(pathOrUrl)) {
+        return pathOrUrl;
+    }
+    return `${getProxyUrl()}${pathOrUrl}`;
+}
 
 async function SearchMovieAndSeries(name) {
     try {
         var values;
-        var data = `query=${name}`
-        await axios({ ...sslfix, url: `${process.env.PROXY_URL}/api/search-autocomplete`, headers: header, method: "POST", data: data }).then((value) => {
-            if (value && value.status == 200 && value.statusText == "OK") {
-                if (value && typeof (value.data) !== "undefined") {
-                    values = value.data;
-                }
-            }
-        }).catch((error)=>{
-            console.log(error);
-        })
+        var data = `query=${encodeURIComponent(name)}`;
+        const response = await axios({
+            ...sslfix,
+            url: resolveUrl('/api/search-autocomplete'),
+            headers: {
+                ...header,
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            method: "POST",
+            data: data
+        });
+        if (response && response.status == 200 && response.statusText == "OK" && typeof response.data !== "undefined") {
+            values = response.data;
+        }
+        return values;
     } catch (error) {
-        if (error) console.log(error);
+        console.log(error);
+        return undefined;
     }
-    return values;
 }
 
 async function SearchMetaMovieAndSeries(id, type) {
     try {
-
-        var response = await axios({ ...sslfix, url: process.env.PROXY_URL + id, headers: header, method: "GET" });
+        var response = await axios({ ...sslfix, url: resolveUrl(id), headers: header, method: "GET" });
         if (response && response.status == 200 && response.statusText == "OK") {
             var $ = cheerio.load(response.data);
             if (type == "series") {
@@ -75,7 +90,7 @@ async function SearchMetaMovieAndSeries(id, type) {
 async function SearchDetailMovieAndSeries(id, type, episode) {
     try {
         if (type == "series") {
-            var response = await axios({ ...sslfix, url: process.env.PROXY_URL + id, headers: header, method: "GET" });
+            var response = await axios({ ...sslfix, url: resolveUrl(id), headers: header, method: "GET" });
             if (response && response.status == 200 && response.statusText == "OK") {
                 var values = [{}];
                 var $ = cheerio.load(response.data);

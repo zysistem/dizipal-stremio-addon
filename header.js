@@ -2,7 +2,8 @@ require("dotenv").config();
 const scrapeCookie = require("./src/scrapeProxyCookie");
 const getUrlApi = require("./src/getUrlApi");
 
-const DEFAULT_PROXY_URL = process.env.PROXY_URL || "https://dizipal1560.com";
+const DEFAULT_PROXY_URL = process.env.PROXY_URL || "https://dizipal1221.com";
+process.env.PROXY_URL = process.env.PROXY_URL || DEFAULT_PROXY_URL;
 
 try {
     getUrlApi.fetchWithUrl().then((value1) => {

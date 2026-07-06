@@ -56,8 +56,7 @@ app.get("/:userConf?/configure", function (req, res) {
 
 app.get('/manifest.json', function (req, res) {
         const newManifest = { ...MANIFEST };
-        // newManifest.behaviorHints.configurationRequired = false;
-        newManifest.behaviorHints.configurationRequired = true;
+        newManifest.behaviorHints.configurationRequired = false;
         return respond(res, newManifest);
 });
 
@@ -73,9 +72,10 @@ app.get('/:userConf/manifest.json', function (req, res) {
 });
 
 //CODE
-app.get("/addon/catalog/:type/:id/search=:search", async (req, res, next) => {
+app.get("/addon/catalog/:type/:id", async (req, res, next) => {
     try {
-        var { type, id, search } = req.params;
+        var { type, id } = req.params;
+        var search = (req.query.search || req.params.search || "").toString();
         search = search.replace(".json", "");
         if (id === "dizipal" || id === "dizipal-movie" || id === "dizipal-series") {
             var cached = myCache.get(search + type)
@@ -116,14 +116,14 @@ app.get("/addon/catalog/:type/:id/search=:search", async (req, res, next) => {
 
 })
 
-app.get('/addon/meta/:type/:id/', async (req, res, next) => {
+app.get(['/meta/:type/:id', '/addon/meta/:type/:id'], async (req, res, next) => {
     try {
         var { type, id } = req.params;
         id = String(id).replace(".json", "");
         var metaObj = {};
         var cached = myCache.get(id);
         if (cached) {
-            return respond(res, { meta: cached,cacheMaxAge: CACHE_MAX_AGE, staleRevalidate: STALE_REVALIDATE_AGE, staleError: STALE_ERROR_AGE })
+            return respond(res, { meta: cached, cacheMaxAge: CACHE_MAX_AGE, staleRevalidate: STALE_REVALIDATE_AGE, staleError: STALE_ERROR_AGE })
         }
 
         var data = await searchVideo.SearchMetaMovieAndSeries(id, type);
@@ -182,7 +182,7 @@ app.get('/addon/meta/:type/:id/', async (req, res, next) => {
 })
 
 
-app.get('/addon/stream/:type/:id/', async (req, res, next) => {
+app.get(['/stream/:type/:id', '/addon/stream/:type/:id'], async (req, res, next) => {
     try {
         var { type, id } = req.params;
         id = String(id).replace(".json", "");
@@ -193,7 +193,7 @@ app.get('/addon/stream/:type/:id/', async (req, res, next) => {
                 if (video.subtitles) {
                     myCache.set(id, video.subtitles);
                 }
-                return respond(res, { streams: [stream],cacheMaxAge: CACHE_MAX_AGE, staleRevalidate: STALE_REVALIDATE_AGE, staleError: STALE_ERROR_AGE })
+                return respond(res, { streams: [stream], cacheMaxAge: CACHE_MAX_AGE, staleRevalidate: STALE_REVALIDATE_AGE, staleError: STALE_ERROR_AGE })
             }
         }
     } catch (error) {
@@ -201,7 +201,7 @@ app.get('/addon/stream/:type/:id/', async (req, res, next) => {
     }
 })
 
-app.get('/addon/subtitles/:type/:id/:query?.json', async (req, res, next) => {
+app.get(['/subtitles/:type/:id/:query?.json', '/addon/subtitles/:type/:id/:query?.json'], async (req, res, next) => {
     try {
         var { type, id } = req.params;
         id = String(id).replace(".json", "");
