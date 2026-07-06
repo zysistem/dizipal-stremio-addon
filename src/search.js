@@ -21,11 +21,34 @@ function resolveUrl(pathOrUrl) {
     return `${getProxyUrl()}${pathOrUrl}`;
 }
 
+const cloudflare = require('./cloudflare');
+
+async function fetchWithFallback(options) {
+    try {
+        const resp = await axios(options);
+        if (resp && typeof resp.data === 'string') {
+            const body = resp.data;
+            if (/just a moment|_cf_chl_|cf-browser-verification/i.test(body) || (resp.status && resp.status >= 400)) {
+                const cfResp = await cloudflare.request({ url: options.url, method: options.method || 'GET', headers: options.headers, data: options.data });
+                return cfResp;
+            }
+        }
+        return resp;
+    } catch (err) {
+        try {
+            const cfResp = await cloudflare.request({ url: options.url, method: options.method || 'GET', headers: options.headers, data: options.data });
+            return cfResp;
+        } catch (e) {
+            throw err;
+        }
+    }
+}
+
 async function SearchMovieAndSeries(name) {
     try {
         var values;
         var data = `query=${encodeURIComponent(name)}`;
-        const response = await axios({
+        const response = await fetchWithFallback({
             ...sslfix,
             url: resolveUrl('/api/search-autocomplete'),
             headers: {
@@ -35,7 +58,7 @@ async function SearchMovieAndSeries(name) {
             method: "POST",
             data: data
         });
-        if (response && response.status == 200 && response.statusText == "OK" && typeof response.data !== "undefined") {
+        if (response && (response.status == 200 || response.status == '200') && typeof response.data !== "undefined") {
             values = response.data;
         }
         return values;
@@ -47,8 +70,8 @@ async function SearchMovieAndSeries(name) {
 
 async function SearchMetaMovieAndSeries(id, type) {
     try {
-        var response = await axios({ ...sslfix, url: resolveUrl(id), headers: header, method: "GET" });
-        if (response && response.status == 200 && response.statusText == "OK") {
+        var response = await fetchWithFallback({ ...sslfix, url: resolveUrl(id), headers: header, method: "GET" });
+        if (response && (response.status == 200 || response.status == '200')) {
             var $ = cheerio.load(response.data);
             if (type == "series") {
                 var name = $("#container > div.popup-inner.auto > div.cover > h5").text().trim();
@@ -90,8 +113,8 @@ async function SearchMetaMovieAndSeries(id, type) {
 async function SearchDetailMovieAndSeries(id, type, episode) {
     try {
         if (type == "series") {
-            var response = await axios({ ...sslfix, url: resolveUrl(id), headers: header, method: "GET" });
-            if (response && response.status == 200 && response.statusText == "OK") {
+            var response = await fetchWithFallback({ ...sslfix, url: resolveUrl(id), headers: header, method: "GET" });
+            if (response && (response.status == 200 || response.status == '200')) {
                 var values = [{}];
                 var $ = cheerio.load(response.data);
                 var data = $(`div.last-episodes.all-episodes > ul:nth-child(${episode})`).find(".episode-item");
