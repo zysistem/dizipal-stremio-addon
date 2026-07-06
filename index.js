@@ -72,7 +72,7 @@ app.get('/:userConf/manifest.json', function (req, res) {
 });
 
 //CODE
-app.get("/addon/catalog/:type/:id", async (req, res, next) => {
+app.get(["/addon/catalog/:type/:id", "/catalog/:type/:id"], async (req, res, next) => {
     try {
         var { type, id } = req.params;
         var search = (req.query.search || req.params.search || "").toString();
