@@ -602,13 +602,12 @@ function landingTemplate(manifest) {
 
          <div class="separator"></div>
 
+         <div class="separator"></div>
+
          <div class="verification-container animate-in">
             <div class="verification-section">
-               <h6>Bot olmadığınızı onaylayın.</h6>
-               <h4>Türkiye'nin başkenti neresidir?</h4>
-               <input type="text" id='soru' placeholder="Yanıt" required>
                <a id="installLink" class="install-link" href="#">
-                  <button id='install' name="Install" disabled>
+                  <button id='install' name="Install">
                      <svg viewBox="0 0 24 24" width="20" height="20">
                         <path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
                      </svg>
@@ -658,7 +657,6 @@ function landingTemplate(manifest) {
       </div>
 
       <script>
-         const soru = document.getElementById("soru");
          const install = document.getElementById("install");
          const installLink = document.getElementById("installLink");
          const loader = document.querySelector('.stremio-loader');
@@ -677,27 +675,7 @@ function landingTemplate(manifest) {
             }, 50);
          }
 
-         function checkAnswer(value) {
-            const answer = String(value).trim().toLowerCase();
-            if(answer === 'ankara') {
-               installLink.href = 'stremio://' + window.location.host + '/addon/manifest.json';
-               install.disabled = false;
-               return true;
-            } else {
-               installLink.href = '#';
-               install.disabled = true;
-               return false;
-            }
-         }
-
-         soru.addEventListener("keyup", (event) => {
-            const isValid = checkAnswer(soru.value);
-            if (event.key === 'Enter' && isValid) {
-               event.preventDefault();
-               startInstallAnimation();
-               window.location.href = installLink.href;
-            }
-         });
+         installLink.href = 'stremio://' + window.location.host + '/addon/manifest.json';
 
          install.addEventListener('click', () => {
             startInstallAnimation();
