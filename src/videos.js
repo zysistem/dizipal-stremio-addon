@@ -7,11 +7,15 @@ const { setupCache } = require("axios-cache-interceptor");
 
 const instance = Axios.create();
 const axios = setupCache(instance);
+const DEFAULT_PROXY_URL = process.env.PROXY_URL || "https://dizipal1221.com";
 
+function getProxyUrl() {
+    return process.env.PROXY_URL || DEFAULT_PROXY_URL;
+}
 
 async function GetVideos(id) {
     try {
-        var response = await axios({ ...sslfix, url: process.env.PROXY_URL + id, headers: header, method: "GET" });
+        var response = await axios({ ...sslfix, url: getProxyUrl() + id, headers: header, method: "GET" });
         if (response && response.status == 200) {
             var $ = cheerio.load(response.data);
             var videoLink = $("#vast_new > iframe").attr("src");

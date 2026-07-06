@@ -4,7 +4,7 @@ const { setupCache } = require("axios-cache-interceptor");
 const instance = Axios.create();
 const axios = setupCache(instance);
 
-const DEFAULT_PROXY_URL = "https://dizipal1560.com";
+const DEFAULT_PROXY_URL = process.env.PROXY_URL || "https://dizipal1221.com";
 
 async function fetchWithUrl() {
     try {
