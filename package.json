@@ -1,6 +1,6 @@
 {
   "name": "dizipal-stremio-addon",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Dizipalda'ki film ve dizileri stremionuza getirir",
   "main": "index.js",
   "scripts": {
