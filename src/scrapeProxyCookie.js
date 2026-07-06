@@ -5,6 +5,9 @@ const instance = Axios.create();
 const axios = setupCache(instance);
 
 async function fetchWithCookies(url) {
+  if (!process.env.COOKIESERVER) {
+    return undefined;
+  }
   var cookieData = {
     url: url,
     token: "free"
