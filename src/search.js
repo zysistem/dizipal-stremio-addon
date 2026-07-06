@@ -47,6 +47,16 @@ async function fetchWithFallback(options) {
 async function SearchMovieAndSeries(name) {
     try {
         var values;
+        var q = (name || '').toString().trim();
+        // If no search term provided, return a small sample 'popular' catalog so home shows content
+        if (!q) {
+            const SAMPLE = [
+                { url: '/film/avengers-endgame', type: 'movie', title: 'Avengers: Endgame', poster: 'https://via.placeholder.com/300x450?text=Avengers+Endgame', genres: 'Action,Adventure' },
+                { url: '/dizi/game-of-thrones', type: 'series', title: 'Game of Thrones', poster: 'https://via.placeholder.com/300x450?text=Game+of+Thrones', genres: 'Drama,Fantasy' },
+                { url: '/film/inception', type: 'movie', title: 'Inception', poster: 'https://via.placeholder.com/300x450?text=Inception', genres: 'Sci-Fi,Thriller' }
+            ];
+            return SAMPLE;
+        }
         var data = `query=${encodeURIComponent(name)}`;
         const response = await fetchWithFallback({
             ...sslfix,
@@ -60,6 +70,10 @@ async function SearchMovieAndSeries(name) {
         });
         if (response && (response.status == 200 || response.status == '200') && typeof response.data !== "undefined") {
             values = response.data;
+        }
+        // fallback to sample if remote returned nothing
+        if (!values || (Array.isArray(values) && values.length === 0)) {
+            return [{ url: '/film/placeholder', type: 'movie', title: 'No Results - try again', poster: 'https://via.placeholder.com/300x450?text=No+Results', genres: 'Drama' }];
         }
         return values;
     } catch (error) {

@@ -55,18 +55,28 @@ app.get("/:userConf?/configure", function (req, res) {
 });
 
 app.get('/manifest.json', function (req, res) {
-        const newManifest = { ...MANIFEST };
-        newManifest.behaviorHints.configurationRequired = false;
-        return respond(res, newManifest);
+    const newManifest = { ...MANIFEST };
+    newManifest.behaviorHints.configurationRequired = false;
+    // Ensure hosting URLs are correct even if HOSTING_URL env is not set
+    const hostUrl = process.env.HOSTING_URL || `${req.protocol}://${req.get('host')}`;
+    newManifest.logo = `${hostUrl}/images/dizipal.png`;
+    newManifest.background = `${hostUrl}/images/background.jpg`;
+    return respond(res, newManifest);
 });
 
 app.get('/:userConf/manifest.json', function (req, res) {
         const newManifest = { ...MANIFEST };
         if (!((req || {}).params || {}).userConf) {
             newManifest.behaviorHints.configurationRequired = true;
+           const hostUrl = process.env.HOSTING_URL || `${req.protocol}://${req.get('host')}`;
+           newManifest.logo = `${hostUrl}/images/dizipal.png`;
+           newManifest.background = `${hostUrl}/images/background.jpg`;
            return respond(res, newManifest);
         } else {
             newManifest.behaviorHints.configurationRequired = false;
+           const hostUrl = process.env.HOSTING_URL || `${req.protocol}://${req.get('host')}`;
+           newManifest.logo = `${hostUrl}/images/dizipal.png`;
+           newManifest.background = `${hostUrl}/images/background.jpg`;
            return respond(res, newManifest);
         }
 });
