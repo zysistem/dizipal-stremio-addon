@@ -126,6 +126,14 @@ app.get(["/addon/catalog/:type/:id", "/catalog/:type/:id"], async (req, res, nex
 
 })
 
+// Handle requests missing an `id` with a clear JSON error (prevents "Cannot GET /meta/series/" HTML)
+app.get(['/meta/:type/', '/meta/:type', '/addon/meta/:type/', '/addon/meta/:type'], async (req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', '*');
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    return res.status(400).send({ error: 'Missing id parameter. Use /meta/:type/:id' });
+});
+
 app.get(['/meta/:type/:id', '/addon/meta/:type/:id'], async (req, res, next) => {
     try {
         var { type, id } = req.params;
