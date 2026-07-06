@@ -9,15 +9,12 @@ const manifest = {
     background: `${process.env.HOSTING_URL}/images/background.jpg`,
     behaviorHints: {
         configurable: false,
-        configurationRequired: true,
+        configurationRequired: false,
     },
-    config: [{
-        key: "dizipal",
-        required: false
-    }],
+    config: [],
     catalogs: [{
         type: "series",
-        id: "dizipal",
+        id: "dizipal-series",
         extra: [{
             name: "search",
             isRequired: true
@@ -25,13 +22,13 @@ const manifest = {
     },
     {
         type: "movie",
-        id: "dizipal",
+        id: "dizipal-movie",
         extra: [{
             name: "search",
             isRequired: true
         }]
     }],
-    resources: ['stream', 'meta', 'subtitles'],
+    resources: ['catalog', 'stream', 'meta', 'subtitles'],
     types: ["movie", 'series'],
     idPrefixes: ["/"]
 }
