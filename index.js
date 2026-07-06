@@ -259,8 +259,9 @@ async function WriteSubtitles(url, name) {
             var subtitle = subsrt.convert(response.data, outputExtension, options).subtitle;
 
             fs.writeFileSync(path.join(__dirname, "static", "subs", name + ".srt"), subtitle);
-            var url = `${process.env.HOSTING_URL}/subs/${name}.srt`;
-            return url;
+            const host = process.env.HOSTING_URL ? process.env.HOSTING_URL.replace(/\/$/, '') : '';
+            const publicUrl = host ? `${host}/subs/${name}.srt` : `/subs/${name}.srt`;
+            return publicUrl;
         }
     } catch (error) {
         console.log(error);

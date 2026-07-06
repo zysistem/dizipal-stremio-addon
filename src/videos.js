@@ -13,6 +13,13 @@ function getProxyUrl() {
     return process.env.PROXY_URL || DEFAULT_PROXY_URL;
 }
 
+function resolveUrl(pathOrUrl) {
+    if (/^https?:\/\//i.test(pathOrUrl)) {
+        return pathOrUrl;
+    }
+    return `${getProxyUrl()}${pathOrUrl}`;
+}
+
 const cloudflare = require('./cloudflare');
 
 async function fetchWithFallback(options) {
@@ -38,7 +45,7 @@ async function fetchWithFallback(options) {
 
 async function GetVideos(id) {
     try {
-        var response = await fetchWithFallback({ ...sslfix, url: getProxyUrl() + id, headers: header, method: "GET" });
+        var response = await fetchWithFallback({ ...sslfix, url: resolveUrl(id), headers: header, method: "GET" });
         if (response && (response.status == 200 || response.status == '200')) {
             var $ = cheerio.load(response.data);
             var videoLink = $("#vast_new > iframe").attr("src");
@@ -58,7 +65,7 @@ async function ScrapeVideoUrl(scrapeUrl) {
             "referer":process.env.PROXY_URL,
             "user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0"
         };
-        var response = await fetchWithFallback({ url: scrapeUrl, headers: scrapeHeader, method: "GET" });
+        var response = await fetchWithFallback({ url: resolveUrl(scrapeUrl), headers: scrapeHeader, method: "GET" });
         if (response && (response.status == 200 || response.status == '200')) {
             var playerFileLink = "";
             var subtitles;
