@@ -5,7 +5,7 @@ const instance = Axios.create();
 const axios = setupCache(instance);
 
 async function fetchWithCookies(url) {
-  if (!process.env.COOKIESERVER) {
+  if (!process.env.COOKIESERVER || process.env.COOKIESERVER === 'undefined') {
     return undefined;
   }
   var cookieData = {
