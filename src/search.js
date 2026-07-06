@@ -2,12 +2,7 @@ require("dotenv").config();
 const header = require("../header");
 const sslfix = require("./sslfix");
 const cheerio = require("cheerio");
-const Axios = require('axios')
-const { setupCache } = require("axios-cache-interceptor");
-
-
-const instance = Axios.create();
-const axios = setupCache(instance);
+const { axios } = require("./axiosClient");
 const DEFAULT_PROXY_URL = process.env.PROXY_URL || "https://dizipal1221.com";
 
 function getProxyUrl() {
@@ -69,10 +64,18 @@ async function SearchMovieAndSeries(name) {
             data: data
         });
         if (response && (response.status == 200 || response.status == '200') && typeof response.data !== "undefined") {
-            values = response.data;
+            if (typeof response.data === 'string') {
+                try {
+                    values = JSON.parse(response.data);
+                } catch (err) {
+                    values = undefined;
+                }
+            } else {
+                values = response.data;
+            }
         }
-        // fallback to sample if remote returned nothing
-        if (!values || (Array.isArray(values) && values.length === 0)) {
+        // fallback to sample if remote returned nothing or invalid data
+        if (!Array.isArray(values) || values.length === 0) {
             return [{ url: '/film/placeholder', type: 'movie', title: 'No Results - try again', poster: 'https://via.placeholder.com/300x450?text=No+Results', genres: 'Drama' }];
         }
         return values;

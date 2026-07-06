@@ -12,12 +12,7 @@ const path = require("path");
 const NodeCache = require("node-cache");
 const { v4: uuidv4 } = require('uuid');
 const subsrt = require('subtitle-converter');
-const Axios = require('axios')
-const { setupCache } = require("axios-cache-interceptor");
-
-
-const instance = Axios.create();
-const axios = setupCache(instance);
+const { axios } = require("./src/axiosClient");
 
 
 

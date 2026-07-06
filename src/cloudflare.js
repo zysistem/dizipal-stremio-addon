@@ -8,6 +8,10 @@ async function request(options) {
             gzip: true,
         };
 
+        if (process.env.REQUEST_PROXY) {
+            requestOptions.proxy = process.env.REQUEST_PROXY;
+        }
+
         if (requestOptions.method && requestOptions.method.toUpperCase() === 'POST') {
             if (requestOptions.data && typeof requestOptions.data === 'object') {
                 requestOptions.form = requestOptions.data;

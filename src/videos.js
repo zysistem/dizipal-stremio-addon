@@ -2,11 +2,7 @@ require("dotenv").config();
 const header = require("../header");
 const sslfix = require("./sslfix");
 const cheerio = require("cheerio");
-const Axios = require('axios')
-const { setupCache } = require("axios-cache-interceptor");
-
-const instance = Axios.create();
-const axios = setupCache(instance);
+const { axios } = require("./axiosClient");
 const DEFAULT_PROXY_URL = process.env.PROXY_URL || "https://dizipal1221.com";
 
 function getProxyUrl() {

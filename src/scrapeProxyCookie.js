@@ -1,8 +1,4 @@
-const Axios = require('axios');
-const { setupCache } = require("axios-cache-interceptor");
-
-const instance = Axios.create();
-const axios = setupCache(instance);
+const { axios } = require("./axiosClient");
 
 async function fetchWithCookies(url) {
   if (!process.env.COOKIESERVER || process.env.COOKIESERVER === 'undefined') {
